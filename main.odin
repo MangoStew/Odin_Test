@@ -15,7 +15,7 @@ Vector4 :: [4]f32
 
 radius : f32 = 32
 loss : f32 = 0.82
-numb_balls : u32: 20
+numb_balls : u32: 22
 
 ball :: struct{
     pos: Vector2,
