@@ -151,15 +151,12 @@ resolveColision :: proc(ball_a, ball_b :^ball  ){
     overlap := min_dist - real_dist
     total_mass := ball_a.mass + ball_b.mass
 
- 
     if real_dist == 0.0 {
-
         delta = Vector2{0.01,0}
         real_dist = 0.01; 
     }
 
     normal : Vector2 = delta/real_dist
-    // // --- 1. Positional correction: push circles apart so they no longer overlap ---
 
     correctionA : Vector2 = normal *(-overlap * (ball_b.mass / total_mass))
     correctionB : Vector2 = normal *( overlap * (ball_a.mass / total_mass))
@@ -168,6 +165,7 @@ resolveColision :: proc(ball_a, ball_b :^ball  ){
 
     //Va2 = (ma - mb)/(ma+mb) * va1 + 2mb/(ma+mb)*Vb1 
     //Vb2 = 2ma/(ma+mb) * va1 + (ma+mb)/(ma+mb)*Vb1 
+
 //    new_va :=   (ball_a.mass - ball_b.mass) * ball_a.vel/total_mass + 2*ball_b.mass*ball_b.vel/total_mass
 //    new_vb :=   2*ball_a.mass*ball_a.vel/total_mass + (ball_b.mass - ball_a.mass) * ball_b.vel/total_mass
 //
@@ -175,7 +173,6 @@ resolveColision :: proc(ball_a, ball_b :^ball  ){
 //    ball_b.vel = new_vb*0.98
 
 
-    // // --- 2. Velocity resolution: 1D elastic collision along the normal ---
     relVel : Vector2 = ball_a.vel- ball_b.vel
     velAlongNormal : f32 = relVel.x * normal.x + relVel.y*normal.y
 
@@ -185,15 +182,10 @@ resolveColision :: proc(ball_a, ball_b :^ball  ){
 
     impulseMag := - (1 + restitution)* velAlongNormal/ (1/ball_a.mass + 1/ball_b.mass)
     impulse : Vector2 = normal * impulseMag
-   // float impulseMag = -(1.0f + restitution) * velAlongNormal /
-   //                     (1.0f / a->mass + 1.0f / b->mass);
-   // Vector2 impulse = Vector2Scale(normal, impulseMag);
 
     ball_a.vel += impulse/ball_a.mass 
     ball_b.vel -= impulse/ball_b.mass
  
-   // a->vel = Vector2Subtract(a->vel, Vector2Scale(impulse, 1.0f / a->mass));
-   // b->vel = Vector2Add(b->vel, Vector2Scale(impulse, 1.0f / b->mass));  
-    
+   
 
 }
