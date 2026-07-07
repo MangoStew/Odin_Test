@@ -19,9 +19,8 @@ gravity: f32 : 400
 Vector2 :: [2]f32
 Vector4 :: [4]f32
 
-window_position : Vector2
 loss: f32 = 0.82
-numb_balls: u32 : 2000
+numb_balls: u32 : 500
 
 ball :: struct {
 	pos: Vector2,
@@ -61,8 +60,14 @@ main :: proc() {
 	}
 
     
+    window_position := rl.GetWindowPosition()
+
 	for !rl.WindowShouldClose() {
+        
+        w_dt := window_position - rl.GetWindowPosition()
+
         window_position = rl.GetWindowPosition()
+        
         rl.DrawText(rl.TextFormat("Position: %.0f, %.0f", window_position.x, window_position.y), 10, 10, 20, rl.DARKGRAY)
         
         width = rl.GetScreenWidth()  
@@ -77,7 +82,7 @@ main :: proc() {
 
         //balls logic
 		for &ball in balls {
-            ball.pos += ball.vel * dt
+            ball.pos += ball.vel * dt + w_dt
             ball.vel.y += gravity * dt
 
 			for &other_ball in balls {
@@ -103,39 +108,25 @@ main :: proc() {
 
 
 resolveWallCollision :: proc(ball :^ball, dt :f32) {
-    nx := ball.pos.x + ball.vel.x * dt
-    ny := ball.pos.y + ball.vel.y * dt
 
     ball.pos.x += ball.vel.x * dt
     ball.pos.y += ball.vel.y * dt  
 
-    global_bpos : Vector2 = {ball.pos.x + window_position.x, ball.pos.y + window_position.y}
-    global_wpos : Vector2 = {cast(f32)width + window_position.x, cast(f32)height + window_position.y}
-//
-//    if nx - ball.rad < cast(f32)0 +window_position.x|| nx + ball.rad > cast(f32)width +window_position.x{
-//        ball.vel.x *= -0.82
-//    } else do ball.pos.x = nx
-//
-//    if ny - ball.rad < cast(f32)0+window_position.y || ny + ball.rad > cast(f32)height +window_position.y{
-//        ball.vel.y *= -0.82
-//    } else do ball.pos.y = ny
-
-
-    if global_bpos.x + cast(f32)ball.rad > global_wpos.x{
+    if ball.pos.x + cast(f32)ball.rad > cast(f32)width{
         ball.vel.x *= -0.82
-        ball.pos.x -= global_bpos.x + cast(f32)ball.rad - global_wpos.x
+        ball.pos.x -= ball.pos.x + cast(f32)ball.rad - cast(f32)width
     }
-    else if global_bpos.x - cast(f32)ball.rad < window_position.x {
+    else if ball.pos.x - cast(f32)ball.rad < 0 {
         ball.vel.x *= -0.82
-        ball.pos.x -= (global_bpos.x - cast(f32)ball.rad) - window_position.x
+        ball.pos.x -= (ball.pos.x - cast(f32)ball.rad)
     }
-    if global_bpos.y + cast(f32)ball.rad > global_wpos.y{
+    if ball.pos.y + cast(f32)ball.rad >cast(f32)height{
         ball.vel.y *= -0.82
-        ball.pos.y -= global_bpos.y + cast(f32)ball.rad - global_wpos.y
+        ball.pos.y -= ball.pos.y + cast(f32)ball.rad - cast(f32)height
     }
-    else if global_bpos.y - cast(f32)ball.rad < window_position.y {
+    else if ball.pos.y - cast(f32)ball.rad < 0{
         ball.vel.y *= -0.82
-        ball.pos.y -= (global_bpos.y - cast(f32)ball.rad)  - window_position.y
+        ball.pos.y -= (ball.pos.y - cast(f32)ball.rad)
     }
 
 }
