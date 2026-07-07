@@ -6,3 +6,6 @@ Just some balls
 Testing magit
 
 And idk
+
+this part will not be stataged
+ 
