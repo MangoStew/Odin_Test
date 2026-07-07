@@ -19,7 +19,9 @@ gravity: f32 : 400
 Vector2 :: [2]f32
 Vector4 :: [4]f32
 
-loss: f32 = 0.82
+ball_damp : f32 : 0.95
+wall_damp : f32 : 0.8
+
 numb_balls: u32 : 500
 
 ball :: struct {
@@ -70,8 +72,8 @@ main :: proc() {
         
         rl.DrawText(rl.TextFormat("Position: %.0f, %.0f", window_position.x, window_position.y), 10, 10, 20, rl.DARKGRAY)
         
-        width = rl.GetScreenWidth()  
-        height = rl.GetScreenHeight() 
+        width := cast(f32)rl.GetScreenWidth()  
+        height := cast(f32)rl.GetScreenHeight() 
         
 
         
@@ -85,6 +87,8 @@ main :: proc() {
             ball.pos += ball.vel * dt + w_dt
             ball.vel.y += gravity * dt
 
+            ball.pos += ball.vel* dt
+
 			for &other_ball in balls {
 				if ball == other_ball do continue
 				if rl.CheckCollisionCircles(ball.pos, ball.rad, other_ball.pos, other_ball.rad) {
@@ -93,7 +97,7 @@ main :: proc() {
 
 			}
 
-            resolveWallCollision(&ball, dt)
+            resolveWallCollision(&ball, dt,width,height)
 
 			rl.DrawCircleV(ball.pos, ball.rad, ball.col)
 
@@ -107,25 +111,22 @@ main :: proc() {
 
 
 
-resolveWallCollision :: proc(ball :^ball, dt :f32) {
+resolveWallCollision :: proc(ball :^ball, dt :f32, width,height :f32) {
 
-    ball.pos.x += ball.vel.x * dt
-    ball.pos.y += ball.vel.y * dt  
-
-    if ball.pos.x + cast(f32)ball.rad > cast(f32)width{
-        ball.vel.x *= -0.82
-        ball.pos.x -= ball.pos.x + cast(f32)ball.rad - cast(f32)width
+    if ball.pos.x + cast(f32)ball.rad > width{
+        ball.vel.x *= -wall_damp
+        ball.pos.x -= ball.pos.x + cast(f32)ball.rad - width
     }
     else if ball.pos.x - cast(f32)ball.rad < 0 {
-        ball.vel.x *= -0.82
+        ball.vel.x *= -wall_damp
         ball.pos.x -= (ball.pos.x - cast(f32)ball.rad)
     }
-    if ball.pos.y + cast(f32)ball.rad >cast(f32)height{
-        ball.vel.y *= -0.82
-        ball.pos.y -= ball.pos.y + cast(f32)ball.rad - cast(f32)height
+    if ball.pos.y + cast(f32)ball.rad >height{
+        ball.vel.y *= -wall_damp
+        ball.pos.y -= ball.pos.y + cast(f32)ball.rad - height
     }
     else if ball.pos.y - cast(f32)ball.rad < 0{
-        ball.vel.y *= -0.82
+        ball.vel.y *= -wall_damp
         ball.pos.y -= (ball.pos.y - cast(f32)ball.rad)
     }
 
@@ -168,10 +169,8 @@ resolveColision :: proc(ball_a, ball_b :^ball  ){
     velAlongNormal : f32 = relVel.x * normal.x + relVel.y*normal.y
 
     if velAlongNormal > 0.0 do return;
- 
-    restitution : f32 = 1
 
-    impulseMag := - (1 + restitution)* velAlongNormal/ (1/ball_a.mass + 1/ball_b.mass)
+    impulseMag := - (1 + ball_damp)* velAlongNormal/ (1/ball_a.mass + 1/ball_b.mass)
     impulse : Vector2 = normal * impulseMag
 
     ball_a.vel += impulse/ball_a.mass 
