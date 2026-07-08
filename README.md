@@ -2,12 +2,11 @@
 
 Testing Odin and Raylib integration
 
-Ball Physics Test
+Balls Physics Test
 
+![ScreenShot](ScreenShot.png)
 
-![ScreenShot](ScreenShot.png))
-
-Left Click to hold ball and inflate it
+Left Click to hold a ball and inflate it
 
 Right Click to Create new balls
 
