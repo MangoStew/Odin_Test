@@ -1,11 +1,14 @@
 # Odin_Test
 
 Testing Odin and Raylib integration
-Just some balls 
 
-Testing magit
+Ball Physics Test
 
-And idk
 
-this part will not be stataged
- 
+![Screenshot](ScreenShots)
+
+Left Click to hold ball and inflate it
+
+Right Click to Create new balls
+
+Move and Resize window effect the balls
